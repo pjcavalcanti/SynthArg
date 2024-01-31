@@ -108,7 +108,8 @@ class TextProofRenderer(Renderer):
         
     
     def assumptionsAndConclusions(self, proof):
-        assumptions = "\n".join(self.exprRend(a) for a in proof.assumptions())
+        seen = set()
+        assumptions = "\n".join(self.exprRend(a) for a in proof.assumptions() if self.exprRend(a) not in seen and not seen.add(self.exprRend(a)))
         conclusion = self.exprRend(proof.conclusion())
 
         assumptions = f"Assumptions:\n{self.indentHelper(assumptions, 1)}"

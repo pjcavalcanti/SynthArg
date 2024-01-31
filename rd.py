@@ -49,15 +49,18 @@ def getProofFor(expr, p = 0.1):
     randExpressionGen = RandomExpressionZipf()
     # proofTypeOptions = typeOfLastStep(expr)
     # proofType = random.choice(proofTypeOptions)
-    if type(expr) in [And]:
-        proofType = elimDict[type(expr)]
+    if type(expr) in [Iff]:
+        # proofType = elimDict[type(expr)]
+        proofType = random.choice([ImpliesElim])
     else:
         proofType = Axiom
 
     if proofType == Axiom:
         return Axiom([expr], [])
     elif proofType == ImpliesIntro:
-        # TODO: Add more options
+        # TODO: Add more options,
+        # at least via "condition from a random choice from current assumptions list"
+        # and via "condition as a random expression"
         options = [
             ImpliesIntro(
                 [expr.descendants()[0]],
@@ -66,6 +69,7 @@ def getProofFor(expr, p = 0.1):
         ]
         return random.choice(options)
     elif proofType == AndIntro:
+        # TODO: Check if more options can be added
         options = [
             AndIntro(
                 [],
@@ -74,6 +78,7 @@ def getProofFor(expr, p = 0.1):
         ]
         return random.choice(options)
     elif proofType == OrIntro:
+        # TODO: Check if more options can be added
         options = [
             OrIntro(
                 [expr.descendants()[1]],
@@ -81,6 +86,7 @@ def getProofFor(expr, p = 0.1):
         ]
         return random.choice(options)
     elif proofType == IffIntro:
+        # TODO: Check if more options can be added
         options = [
             IffIntro(
                 [],
@@ -91,6 +97,7 @@ def getProofFor(expr, p = 0.1):
         ]
         return random.choice(options)
     elif proofType == NotIntro:
+        # TODO: Check if more options can be added
         options = [
             NotIntro(
                 [expr.descendants()[0]],
@@ -99,22 +106,62 @@ def getProofFor(expr, p = 0.1):
         ]
         return random.choice(options)
     elif proofType == AndElim:
-        # TODO: Add more options 
+        # TODO: Add more options,
+        # at least via "and with a random choice from current assumptions list"
         options = [
             AndElim(
                 [],
-                [And(expr, randExpressionGen())],
+                [getProofFor(And(expr, randExpressionGen()))],
             ),
         ]
         return random.choice(options)
+    elif proofType == OrElim:
+        # TODO: Add more options,
+        # at least via "or with a random choice from current assumptions list"
+        options = [
+            OrElim(
+                [],
+                [
+                    getProofFor(Or(randExpressionGen(), randExpressionGen())),
+                    getProofFor(expr, p),
+                    getProofFor(expr, p),
+                ],
+            ),
+        ]
+        return random.choice(options)
+    elif proofType == ImpliesElim:
+        # TODO: Add more options,
+        # at least via "implies with condition from a random choice from current assumptions list"
+        rndExpr = randExpressionGen()
+        options = [
+            ImpliesElim(
+                [],
+                [
+                    getProofFor(rndExpr, p),
+                    getProofFor(Implies(rndExpr, expr), p),
+                ],
+            ),
+        ]
+        return random.choice(options)
+    elif proofType == IffElim:
+        options = [
+            IffElim(
+                [],
+                [
+                    getProofFor(Iff(expr.descendants()[0], expr.descendants()[1]), p),
+                ],
+            ),
+        ]
 
-random.seed(0)
+random.seed(1)
 p = Variable("p")
 q = Variable("q")
+# toProve = p
 toProve = Iff(p, q)
-toProve = Not(p)
-toProve = And(p, q)
+# toProve = Not(p)
+# toProve = And(p, q)
 # toProve = FFalse()
 
 render = TextProofRenderer()
-print(render(getProofFor(toProve)))
+proved = render(getProofFor(toProve))
+print(proved, "\n", proved is None)

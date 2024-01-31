@@ -8,7 +8,7 @@ class IffElim(Proof):
     def assumptions(self):
         return self.iffProof.assumptions()
     def conclusion(self):
-        return Implies(self.iffProof.conclusion().left, self.iffProof.conclusion().right)
+        return Implies(self.iffProof.conclusion().descendants()[0], self.iffProof.conclusion().descendants()[1])
     def descendants(self):
         return [self.iffProof]
     
