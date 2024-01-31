@@ -3,14 +3,16 @@ from zol import RAA, AndIntro, Axiom, IffIntro, ImpliesElim, ImpliesIntro, NotEl
 
 from renderers import TextExpressionRenderer, TextProofRenderer
 from generators import RandomExpressionZipf
+from zol.expression_types.false import FFalse
+from zol.expression_types.true import TTrue
 
 exprrender = TextExpressionRenderer()
 render = TextProofRenderer()
 p = Variable("p")
 q = Variable("q")
 notP = Not(p)
-tr = TruthValue("T")
-fa = TruthValue("F")
+tr = TTrue()
+fa = FFalse()
 
 print(exprrender(p), exprrender(q), exprrender(notP))
 print(p == p, p == q, p == notP, notP == notP)

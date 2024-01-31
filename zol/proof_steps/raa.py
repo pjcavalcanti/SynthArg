@@ -1,4 +1,5 @@
 from zol.expression_types.expression import Expression
+from zol.expression_types.false import FFalse
 from zol.expression_types.not_expression import Not
 from zol.expression_types.truthvalue import TruthValue
 from zol.proof_steps.proof import Proof
@@ -24,8 +25,7 @@ class RAA(Proof):
         propositionToProve = listOfExpressions[0]
         proofOfAbsurd = listOfProofs[0]
         assert isinstance(proofOfAbsurd, Proof)
-        assert isinstance(proofOfAbsurd.conclusion(), TruthValue)
-        assert proofOfAbsurd.conclusion().name == "F"
+        assert isinstance(proofOfAbsurd.conclusion(), FFalse)
         assert isinstance(propositionToProve, Expression)
         return True
     

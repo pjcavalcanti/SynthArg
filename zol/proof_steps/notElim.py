@@ -1,3 +1,4 @@
+from zol.expression_types.false import FFalse
 from zol.expression_types.not_expression import Not
 from zol.expression_types.truthvalue import TruthValue
 from zol.proof_steps.proof import Proof
@@ -7,7 +8,7 @@ class NotElim(Proof):
     def assumptions(self):
         return self.positiveProof.assumptions() + self.negativeProof.assumptions()
     def conclusion(self):
-        return TruthValue("F")
+        return FFalse()
     def descendants(self):
         return [self.positiveProof, self.negativeProof]
     
