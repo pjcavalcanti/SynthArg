@@ -19,10 +19,16 @@ class IffElim(Proof):
     def arityExpressions(cls):
         return 0
     @classmethod
-    def validate_representation(self, listOfExpressions, listOfProofs):
-        iffProof = listOfProofs[0]
-        assert isinstance(iffProof, Proof)
-        assert isinstance(iffProof.conclusion(), Iff)
+    def repr_expression_types(cls):
+        return []
+    @classmethod
+    def repr_proof_types(cls):
+        return [Proof]
+    @classmethod
+    def repr_proof_conclusion_types(cls):
+        return [Iff]
+    @classmethod
+    def repr_proof_conclusion_invariants(cls, self):
         return True
     
     def __init__(self, listOfExpressions, listOfProofs):

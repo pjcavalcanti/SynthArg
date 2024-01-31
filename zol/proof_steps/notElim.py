@@ -1,3 +1,4 @@
+from zol.expression_types.expression import Expression
 from zol.expression_types.false import FFalse
 from zol.expression_types.not_expression import Not
 from zol.expression_types.truthvalue import TruthValue
@@ -19,18 +20,21 @@ class NotElim(Proof):
     def arityExpressions(cls):
         return 0
     @classmethod
-    def validate_representation(self, listOfExpressions, listOfProofs):
-        positiveProof = listOfProofs[0]
-        negativeProof = listOfProofs[1]
-        assert isinstance(positiveProof, Proof)
-        assert isinstance(negativeProof, Proof)
-        assert isinstance(negativeProof.conclusion(), Not)
-        assert negativeProof.conclusion().descendants()[0] == positiveProof.conclusion()
+    def repr_expression_types(cls):
+        return []
+    @classmethod
+    def repr_proof_types(cls):
+        return [Proof, Proof]
+    @classmethod
+    def repr_proof_conclusion_types(cls):
+        return [Expression, Not]
+    @classmethod
+    def repr_proof_conclusion_invariants(cls, self):
         return True
     
-    def __init__(self, listOfExpressions, listOfProofs):
+    def __init__(self, listOfExpressions, listOfProofs):    
         super().__init__(listOfExpressions, listOfProofs)
-        
+
         self.positiveProof = listOfProofs[0]
         self.negativeProof = listOfProofs[1]
 

@@ -17,9 +17,16 @@ class Axiom(Proof):
     def arityExpressions(cls):
         return 1
     @classmethod
-    def validate_representation(self, listOfExpressions, listOfProofs):
-        expression = listOfExpressions[0]
-        assert isinstance(expression, Expression)
+    def repr_expression_types(cls):
+        return [Expression]
+    @classmethod
+    def repr_proof_types(cls):
+        return []
+    @classmethod
+    def repr_proof_conclusion_types(cls):
+        return []
+    @classmethod
+    def repr_proof_conclusion_invariants(cls, self):
         return True
     
     def __init__(self, listOfExpressions, listOfProofs):

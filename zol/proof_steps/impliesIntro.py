@@ -18,11 +18,16 @@ class ImpliesIntro(Proof):
     def arityExpressions(cls):
         return 1
     @classmethod
-    def validate_representation(self, listOfExpressions, listOfProofs):
-        conditionExpression = listOfExpressions[0]
-        conclusionProof = listOfProofs[0]
-        assert isinstance(conditionExpression, Expression)
-        assert isinstance(conclusionProof, Proof)
+    def repr_expression_types(cls):
+        return [Expression]
+    @classmethod
+    def repr_proof_types(cls):
+        return [Proof]
+    @classmethod
+    def repr_proof_conclusion_types(cls):
+        return [Expression]
+    @classmethod
+    def repr_proof_conclusion_invariants(cls, self):
         return True
     
     def __init__(self, listOfExpressions, listOfProofs):

@@ -18,20 +18,25 @@ class IffIntro(Proof):
     def arityExpressions(cls):
         return 0
     @classmethod
-    def validate_representation(self, listOfExpressions, listOfProofs):
+    def repr_expression_types(cls):
+        return []
+    @classmethod
+    def repr_proof_types(cls):
+        return [Proof, Proof]
+    @classmethod
+    def repr_proof_conclusion_types(cls):
+        return [Implies, Implies]
+    @classmethod
+    def repr_proof_conclusion_invariants(cls, listOfProofs):
         leftProof = listOfProofs[0]
         rightProof = listOfProofs[1]
-        assert isinstance(leftProof, Proof)
-        assert isinstance(rightProof, Proof)
-        assert isinstance(leftProof.conclusion(), Implies)
-        assert isinstance(rightProof.conclusion(), Implies)
         assert leftProof.conclusion().left == rightProof.conclusion().right
         assert leftProof.conclusion().right == rightProof.conclusion().left
         return True
     
     def __init__(self, listOfExpressions, listOfProofs):
         super().__init__(listOfExpressions, listOfProofs)
-        
+
         self.leftProof = listOfProofs[0]
         self.rightProof = listOfProofs[1]
 

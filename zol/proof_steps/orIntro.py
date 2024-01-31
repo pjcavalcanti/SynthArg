@@ -20,13 +20,17 @@ class OrIntro(Proof):
     def arityExpressions(cls):
         return 1
     @classmethod
-    def validate_representation(self, listOfExpressions, listOfProofs):
-        propositionAtRight = listOfExpressions[0]
-        proofOfLeft = listOfProofs[0]
-        assert isinstance(proofOfLeft, Proof)
-        assert isinstance(propositionAtRight, Expression)
+    def repr_expression_types(cls):
+        return [Expression]
+    @classmethod
+    def repr_proof_types(cls):
+        return [Proof]
+    @classmethod
+    def repr_proof_conclusion_types(cls):
+        return [Expression]
+    @classmethod
+    def repr_proof_conclusion_invariants(cls, self):
         return True
-    
     
     def __init__(self, listOfExpressions, listOfProofs):
         super().__init__(listOfExpressions, listOfProofs)

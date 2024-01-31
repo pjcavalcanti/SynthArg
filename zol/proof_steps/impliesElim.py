@@ -1,3 +1,4 @@
+from zol.expression_types.expression import Expression
 from zol.expression_types.implies import Implies
 from zol.proof_steps.proof import Proof
 
@@ -17,17 +18,23 @@ class ImpliesElim(Proof):
     def arityExpressions(cls):
         return 0
     @classmethod
-    def validate_representation(self, listOfExpressions, listOfProofs):
+    def repr_expression_types(cls):
+        return []
+    @classmethod
+    def repr_proof_types(cls):
+        return [Proof, Proof]
+    @classmethod
+    def repr_proof_conclusion_types(cls):
+        return [Expression, Implies]
+    @classmethod
+    def repr_proof_conclusion_invariants(cls, listOfProofs):
         conditionProof = listOfProofs[0]
-        implicationProof = listOfProofs[1]
-        assert isinstance(conditionProof, Proof)
-        assert isinstance(implicationProof, Proof)
-        assert isinstance(implicationProof.conclusion(), Implies)
-        assert implicationProof.conclusion().left == conditionProof.conclusion()
-        return True
+        conclusionProof = listOfProofs[1]
+        return conclusionProof.conclusion().left == conditionProof.conclusion()
     
     def __init__(self, listOfExpressions, listOfProofs):
         super().__init__(listOfExpressions, listOfProofs)
-        
+
         self.conditionProof = listOfProofs[0]
         self.conclusionProof = listOfProofs[1]
+        

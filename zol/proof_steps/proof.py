@@ -18,19 +18,32 @@ class Proof():
     def arityExpressions(cls):
         return NotImplementedError
     @classmethod
-    def validate_representation(self):
-        raise NotImplementedError
+    def repr_expression_types(cls):
+        return NotImplementedError
+    @classmethod
+    def repr_proof_types(cls):
+        return NotImplementedError
+    @classmethod
+    def repr_proof_conclusion_types(cls):
+        return NotImplementedError
+    @classmethod
+    def repr_proof_conclusion_invariants(cls, self):
+        return NotImplementedError
     
     def __init__(self, listOfExpressions: List[Expression], listOfProofs: List['Proof']) -> None:
+        # Guarantees representation is correct
+        # Representation types
         assert len(listOfProofs) == self.arityProofs()
         assert len(listOfExpressions) == self.arityExpressions()
 
-        for expression in listOfExpressions:
-            assert isinstance(expression, Expression)
-        for proof in listOfProofs:
-            assert isinstance(proof, Proof)
-
-        isValidRep = self.validate_representation(listOfExpressions, listOfProofs)
-        assert type(isValidRep) == bool
-        assert isValidRep
+        for expression, typeProofShouldBe in zip(listOfExpressions, self.repr_expression_types()):
+            assert isinstance(expression, typeProofShouldBe)
+        for proof, typeProofShouldBe, typeConclusionShouldBe in zip(listOfProofs,
+                                       self.repr_proof_types(),
+                                       self.repr_proof_conclusion_types()):
+            assert isinstance(proof, typeProofShouldBe)
+            assert isinstance(proof.conclusion(), typeConclusionShouldBe)
+            
+        # Representation values
+        assert self.repr_proof_conclusion_invariants(listOfProofs)
     

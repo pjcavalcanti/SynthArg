@@ -1,3 +1,4 @@
+from zol.expression_types.expression import Expression
 from zol.expression_types.or_expression import Or
 from zol.proof_steps.proof import Proof
 
@@ -22,16 +23,19 @@ class OrElim(Proof):
     def arityExpressions(cls):
         return 0
     @classmethod
-    def validate_representation(self, listOfExpressions, listOfProofs):
-        proofOfOr = listOfProofs[0]
+    def repr_expression_types(cls):
+        return []
+    @classmethod
+    def repr_proof_types(cls):
+        return [Proof, Proof, Proof]
+    @classmethod
+    def repr_proof_conclusion_types(cls):
+        return [Or, Expression, Expression]
+    @classmethod
+    def repr_proof_conclusion_invariants(cls, listOfProofs):
         leftProofOfP = listOfProofs[1]
         rightProofOfP = listOfProofs[2]
-        assert isinstance(proofOfOr, Proof)
-        assert isinstance(proofOfOr, Or)
-        assert isinstance(leftProofOfP, Proof)
-        assert isinstance(rightProofOfP, Proof)
-        assert leftProofOfP.conclusion() == rightProofOfP.conclusion()
-        return True
+        return leftProofOfP.conclusion() == rightProofOfP.conclusion()
     
     def __init__(self, listOfExpressions, listOfProofs):
         super().__init__(listOfExpressions, listOfProofs)

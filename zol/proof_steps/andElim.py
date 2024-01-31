@@ -17,13 +17,20 @@ class AndElim(Proof):
     def arityExpressions(cls):
         return 0
     @classmethod
-    def validate_representation(self, listOfExpressions, listOfProofs):
-        andProof = listOfProofs[0]
-        assert isinstance(andProof, Proof)
-        assert isinstance(andProof.conclusion(), And)
+    def repr_expression_types(cls):
+        return [And]
+    @classmethod
+    def repr_proof_types(cls):
+        return [Proof]
+    @classmethod
+    def repr_proof_conclusion_types(cls):
+        return [And]
+    @classmethod
+    def repr_proof_conclusion_invariants(cls, self):
         return True
     
     def __init__(self, listOfExpressions, listOfProofs):
         super().__init__(listOfExpressions, listOfProofs)
-
+ 
         self.andProof = listOfProofs[0]
+
