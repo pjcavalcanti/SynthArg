@@ -6,7 +6,9 @@ from zol.proof_steps.proof import Proof
 class OrElim(Proof):
     # UNTESTED
     def assumptions(self):
-        return  [a for a in self.leftProofOfP.assumptions()
+        return  [a for a in self.proofOfOr.assumptions()]\
+                + \
+                [a for a in self.leftProofOfP.assumptions()
                 if a != self.proofOfOr.conclusion().descendants()[0]]\
                 + \
                 [a for a in self.rightProofOfP.assumptions()
