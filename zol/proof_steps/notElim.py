@@ -1,6 +1,7 @@
-from .proof import Proof
-from ..expression_types.not_expression import Not
-from ..expression_types.truthvalue import TruthValue
+from zol.expression_types.not_expression import Not
+from zol.expression_types.truthvalue import TruthValue
+from zol.proof_steps.proof import Proof
+
 
 class NotElim(Proof):
     def assumptions(self):

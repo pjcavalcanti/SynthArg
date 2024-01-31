@@ -1,5 +1,6 @@
-from .proof import Proof
-from ..expression_types.or_expression import Or
+from zol.expression_types.or_expression import Or
+from zol.proof_steps.proof import Proof
+
 
 class OrElim(Proof):
     # UNTESTED

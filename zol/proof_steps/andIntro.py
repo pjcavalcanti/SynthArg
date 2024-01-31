@@ -1,5 +1,6 @@
-from .proof import Proof
-from ..expression_types.and_expression import And
+from zol.expression_types.and_expression import And
+from zol.proof_steps.proof import Proof
+
 
 class AndIntro(Proof):
     def assumptions(self):

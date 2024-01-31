@@ -1,6 +1,7 @@
-from .proof import Proof
-from ..expression_types.expression import Expression
-from ..expression_types.implies import Implies
+from zol.expression_types.expression import Expression
+from zol.expression_types.implies import Implies
+from zol.proof_steps.proof import Proof
+
 
 class ImpliesIntro(Proof):
     def assumptions(self):

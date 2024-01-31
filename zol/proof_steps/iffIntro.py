@@ -1,6 +1,7 @@
+from zol.expression_types.iff import Iff
 from zol.expression_types.implies import Implies
-from .proof import Proof
-from ..expression_types.iff import Iff
+from zol.proof_steps.proof import Proof
+
 
 class IffIntro(Proof):
     def assumptions(self):

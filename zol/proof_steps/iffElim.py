@@ -1,6 +1,7 @@
-from .proof import Proof
-from ..expression_types.iff import Iff
-from ..expression_types.implies import Implies
+from zol.expression_types.iff import Iff
+from zol.expression_types.implies import Implies
+from zol.proof_steps.proof import Proof
+
 
 class IffElim(Proof):
     # The same as IffElimLeft

@@ -1,5 +1,6 @@
-from .proof import Proof
-from ..expression_types.implies import Implies
+from zol.expression_types.implies import Implies
+from zol.proof_steps.proof import Proof
+
 
 class ImpliesElim(Proof):
     def assumptions(self):

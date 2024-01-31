@@ -1,5 +1,6 @@
-from .proof import Proof
-from ..expression_types.expression import Expression
+from zol.expression_types.expression import Expression
+from zol.proof_steps.proof import Proof
+
 
 class Axiom(Proof):
     def assumptions(self):
