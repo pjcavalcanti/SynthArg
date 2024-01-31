@@ -1,8 +1,6 @@
 from .expression import Expression
         
 class Variable(Expression):
-    def type(self):
-        return "Variable"
     def descendants(self):
         return []
     @classmethod

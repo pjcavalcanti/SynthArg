@@ -12,10 +12,19 @@ class IffElim(Proof):
         return [self.iffProof]
     
     @classmethod
-    def arity(cls):
+    def arityProofs(cls):
         return 1
-    
-    def __init__(self, iffProof):
+    @classmethod
+    def arityExpressions(cls):
+        return 0
+    @classmethod
+    def validate_representation(self, listOfExpressions, listOfProofs):
+        iffProof = listOfProofs[0]
         assert isinstance(iffProof, Proof)
         assert isinstance(iffProof.conclusion(), Iff)
-        self.iffProof = iffProof
+        return True
+    
+    def __init__(self, listOfExpressions, listOfProofs):
+        super().__init__(listOfExpressions, listOfProofs)
+
+        self.iffProof = listOfProofs[0]

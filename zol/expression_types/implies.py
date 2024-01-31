@@ -1,8 +1,6 @@
 from .expression import Expression
 
 class Implies(Expression):
-    def type(self):
-        return "Implies"
     def descendants(self):
         return [self.left, self.right]
     @classmethod

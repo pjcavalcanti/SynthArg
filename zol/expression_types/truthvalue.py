@@ -3,8 +3,6 @@ from .expression import Expression
 class TruthValue(Expression):
     _truth_values = ["T", "F"]
 
-    def type(self):
-        return "TruthValue"
     def descendants(self):
         return []
     @classmethod

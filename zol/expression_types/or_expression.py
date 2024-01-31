@@ -1,8 +1,6 @@
 from .expression import Expression
 
 class Or(Expression):
-    def type(self):
-        return "Or"
     def descendants(self):
         return [self.left, self.right]
     @classmethod

@@ -1,8 +1,6 @@
 from .expression import Expression
 
 class And(Expression):
-    def type(self):
-        return "And"
     def descendants(self):
         return [self.left, self.right]
     @classmethod

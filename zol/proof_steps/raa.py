@@ -13,13 +13,23 @@ class RAA(Proof):
         return [self.proofOfAbsurd]
     
     @classmethod
-    def arity(cls):
+    def arityProofs(cls):
         return 1
-    
-    def __init__(self, propositionToProve, proofOfAbsurd):
+    @classmethod
+    def arityExpressions(cls):
+        return 1
+    @classmethod
+    def validate_representation(self, listOfExpressions, listOfProofs):
+        propositionToProve = listOfExpressions[0]
+        proofOfAbsurd = listOfProofs[0]
         assert isinstance(proofOfAbsurd, Proof)
         assert isinstance(proofOfAbsurd.conclusion(), TruthValue)
         assert proofOfAbsurd.conclusion().name == "F"
         assert isinstance(propositionToProve, Expression)
-        self.proofOfAbsurd = proofOfAbsurd
-        self.propositionToProve = propositionToProve
+        return True
+    
+    def __init__(self, listOfExpressions, listOfProofs):
+        super().__init__(listOfExpressions, listOfProofs)
+        
+        self.propositionToProve = listOfExpressions[0]
+        self.proofOfAbsurd = listOfProofs[0]

@@ -10,12 +10,23 @@ class ImpliesElim(Proof):
         return [self.conditionProof, self.conclusionProof]
     
     @classmethod
-    def arity(cls):
+    def arityProofs(cls):
         return 2
-    
-    def __init__(self, conditionProof, implicationProof):
+    @classmethod
+    def arityExpressions(cls):
+        return 0
+    @classmethod
+    def validate_representation(self, listOfExpressions, listOfProofs):
+        conditionProof = listOfProofs[0]
+        implicationProof = listOfProofs[1]
         assert isinstance(conditionProof, Proof)
         assert isinstance(implicationProof, Proof)
         assert isinstance(implicationProof.conclusion(), Implies)
-        self.conditionProof = conditionProof
-        self.conclusionProof = implicationProof
+        assert implicationProof.conclusion().left == conditionProof.conclusion()
+        return True
+    
+    def __init__(self, listOfExpressions, listOfProofs):
+        super().__init__(listOfExpressions, listOfProofs)
+        
+        self.conditionProof = listOfProofs[0]
+        self.conclusionProof = listOfProofs[1]

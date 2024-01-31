@@ -11,11 +11,21 @@ class ImpliesIntro(Proof):
         return [self.conclusionProof]
     
     @classmethod
-    def arity(cls):
-        return 2
-    
-    def __init__(self, conditionExpression, conclusionProof):
+    def arityProofs(cls):
+        return 1
+    @classmethod
+    def arityExpressions(cls):
+        return 1
+    @classmethod
+    def validate_representation(self, listOfExpressions, listOfProofs):
+        conditionExpression = listOfExpressions[0]
+        conclusionProof = listOfProofs[0]
         assert isinstance(conditionExpression, Expression)
         assert isinstance(conclusionProof, Proof)
-        self.conclusionProof = conclusionProof
-        self.conditionExpression = conditionExpression
+        return True
+    
+    def __init__(self, listOfExpressions, listOfProofs):
+        super().__init__(listOfExpressions, listOfProofs)
+        
+        self.conditionExpression = listOfExpressions[0]
+        self.conclusionProof = listOfProofs[0]

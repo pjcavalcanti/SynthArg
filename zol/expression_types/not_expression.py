@@ -1,8 +1,6 @@
 from .expression import Expression
 
 class Not(Expression):
-    def type(cls):
-        return "Not"
     def descendants(self):
         return [self.child]
     @classmethod

@@ -13,11 +13,22 @@ class OrIntro(Proof):
         return [self.proofOfLeft]
     
     @classmethod
-    def arity(cls):
-        return 2
-    
-    def __init__(self, propositionAtRight, proofOfLeft):
+    def arityProofs(cls):
+        return 1
+    @classmethod
+    def arityExpressions(cls):
+        return 1
+    @classmethod
+    def validate_representation(self, listOfExpressions, listOfProofs):
+        propositionAtRight = listOfExpressions[0]
+        proofOfLeft = listOfProofs[0]
         assert isinstance(proofOfLeft, Proof)
         assert isinstance(propositionAtRight, Expression)
-        self.proofOfLeft = proofOfLeft
-        self.propositionAtRight = propositionAtRight
+        return True
+    
+    
+    def __init__(self, listOfExpressions, listOfProofs):
+        super().__init__(listOfExpressions, listOfProofs)
+        
+        self.propositionAtRight = listOfExpressions[0]
+        self.proofOfLeft = listOfProofs[0]

@@ -10,9 +10,18 @@ class Axiom(Proof):
         return []
     
     @classmethod
-    def arity(cls):
+    def arityProofs(cls):
         return 0
-    
-    def __init__(self, expression):
+    @classmethod
+    def arityExpressions(cls):
+        return 1
+    @classmethod
+    def validate_representation(self, listOfExpressions, listOfProofs):
+        expression = listOfExpressions[0]
         assert isinstance(expression, Expression)
-        self.axiomExpresion = expression
+        return True
+    
+    def __init__(self, listOfExpressions, listOfProofs):
+        super().__init__(listOfExpressions, listOfProofs)
+
+        self.axiomExpresion = listOfExpressions[0]

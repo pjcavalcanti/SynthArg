@@ -2,7 +2,6 @@ from .proof import Proof
 from ..expression_types.and_expression import And
 
 class AndElim(Proof):
-    # The same as AndElimRight
     def assumptions(self):
         return self.andProof.assumptions()
     def conclusion(self):
@@ -11,10 +10,19 @@ class AndElim(Proof):
         return [self.andProof]
     
     @classmethod
-    def arity(cls):
+    def arityProofs(cls):
         return 1
-    
-    def __init__(self, andProof):
+    @classmethod
+    def arityExpressions(cls):
+        return 0
+    @classmethod
+    def validate_representation(self, listOfExpressions, listOfProofs):
+        andProof = listOfProofs[0]
         assert isinstance(andProof, Proof)
         assert isinstance(andProof.conclusion(), And)
-        self.andProof = andProof
+        return True
+    
+    def __init__(self, listOfExpressions, listOfProofs):
+        super().__init__(listOfExpressions, listOfProofs)
+
+        self.andProof = listOfProofs[0]

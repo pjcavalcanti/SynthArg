@@ -1,8 +1,6 @@
 from .expression import Expression
 
 class Iff(Expression):
-    def type(self):
-        return "Iff"
     def descendants(self):
         return [self.left, self.right]
     @classmethod

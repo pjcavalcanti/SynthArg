@@ -11,13 +11,25 @@ class NotElim(Proof):
         return [self.positiveProof, self.negativeProof]
     
     @classmethod
-    def arity(cls):
+    def arityProofs(cls):
         return 2
-    
-    def __init__(self, positiveProof, negativeProof):
+    @classmethod
+    def arityExpressions(cls):
+        return 0
+    @classmethod
+    def validate_representation(self, listOfExpressions, listOfProofs):
+        positiveProof = listOfProofs[0]
+        negativeProof = listOfProofs[1]
         assert isinstance(positiveProof, Proof)
         assert isinstance(negativeProof, Proof)
         assert isinstance(negativeProof.conclusion(), Not)
         assert negativeProof.conclusion().descendants()[0] == positiveProof.conclusion()
-        self.positiveProof = positiveProof
-        self.negativeProof = negativeProof
+        return True
+    
+    def __init__(self, listOfExpressions, listOfProofs):
+        super().__init__(listOfExpressions, listOfProofs)
+        
+        self.positiveProof = listOfProofs[0]
+        self.negativeProof = listOfProofs[1]
+
+    

@@ -10,11 +10,21 @@ class AndIntro(Proof):
         return [self.leftProof, self.rightProof]
     
     @classmethod
-    def arity(cls):
+    def arityProofs(cls):
         return 2
-    
-    def __init__(self, leftProof, rightProof):
+    @classmethod
+    def arityExpressions(cls):
+        return 0
+    @classmethod
+    def validate_representation(self, listOfExpressions, listOfProofs):
+        leftProof = listOfProofs[0]
+        rightProof = listOfProofs[1]
         assert isinstance(leftProof, Proof)
         assert isinstance(rightProof, Proof)
-        self.leftProof = leftProof
-        self.rightProof = rightProof
+        return True
+    
+    def __init__(self,listOfExpressions, listOfProofs):
+        super().__init__(listOfExpressions, listOfProofs)
+
+        self.leftProof = listOfProofs[0]
+        self.rightProof = listOfProofs[1]

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from zol import Expression
+from zol import Expression, TruthValue, Variable, Not, And, Or, Implies, Iff
 from zol import Proof
 
 class Renderer(ABC):
@@ -14,26 +14,27 @@ class TextExpressionRenderer(Renderer):
     def render(self, expression):
         if not isinstance(expression, Expression):
             raise TypeError("expression must be an Expression")
+        typeOfExpression = type(expression)
             
-        if expression.type() == "TruthValue":
+        if type(expression) == TruthValue:
             if expression.name == "T":
                 return "⊤"
             return "⊥"
-        elif expression.type() == "Variable":
+        elif typeOfExpression == Variable:
             return expression.name
-        elif expression.type() == "Not":
+        elif typeOfExpression == Not:
             return f"¬{self.render(expression.child)}"
-        elif expression.type() == "And":
+        elif typeOfExpression == And:
             return f"({self.render(expression.left)} ∧ {self.render(expression.right)})"
-        elif expression.type() == "Or":
+        elif typeOfExpression == Or:
             return f"({self.render(expression.left)} ∨ {self.render(expression.right)})"
-        elif expression.type() == "Implies":
+        elif typeOfExpression == Implies:
             return f"({self.render(expression.left)} → {self.render(expression.right)})"
-        elif expression.type() == "Iff":
+        elif typeOfExpression == Iff:
             return f"({self.render(expression.left)} ↔ {self.render(expression.right)})"
         else:
             arity = expression.arity()
-            output = f"{expression.type()}("
+            output = f"{typeOfExpression}("
             for i in range(arity):
                 output += self.render(expression.descendants()[i])
                 if i < arity - 1:

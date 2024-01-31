@@ -15,15 +15,26 @@ class OrElim(Proof):
         return [self.proofOfOr, self.leftProofOfP, self.rightProofOfP]
     
     @classmethod
-    def arity(cls):
-        return 2
-    
-    def __init__(self, proofOfOr, leftProofOfP, rightProofOfP):
+    def arityProofs(cls):
+        return 3
+    @classmethod
+    def arityExpressions(cls):
+        return 0
+    @classmethod
+    def validate_representation(self, listOfExpressions, listOfProofs):
+        proofOfOr = listOfProofs[0]
+        leftProofOfP = listOfProofs[1]
+        rightProofOfP = listOfProofs[2]
         assert isinstance(proofOfOr, Proof)
         assert isinstance(proofOfOr, Or)
         assert isinstance(leftProofOfP, Proof)
         assert isinstance(rightProofOfP, Proof)
         assert leftProofOfP.conclusion() == rightProofOfP.conclusion()
-        self.proofOfOr = proofOfOr
-        self.leftProofOfP = leftProofOfP
-        self.rightProofOfP = rightProofOfP
+        return True
+    
+    def __init__(self, listOfExpressions, listOfProofs):
+        super().__init__(listOfExpressions, listOfProofs)
+        
+        self.proofOfOr = listOfProofs[0]
+        self.leftProofOfP = listOfProofs[1]
+        self.rightProofOfP = listOfProofs[2]
