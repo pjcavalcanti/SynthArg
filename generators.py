@@ -1,5 +1,5 @@
 from random import Random
-from expressions import Iff, Implies, Not, And, Or, Variable
+from zol import Iff, Implies, Not, And, Or, Variable
 
 class RandomExpressionZipf():
     # Generates random expressions by extending a branch of the expression tree

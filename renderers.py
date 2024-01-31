@@ -1,7 +1,7 @@
-from expressions import Expression
 from abc import ABC, abstractmethod
 
-from proofs import Proof
+from zol import Expression
+from zol import Proof
 
 class Renderer(ABC):
     @abstractmethod
