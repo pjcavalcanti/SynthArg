@@ -33,11 +33,12 @@ class Proof():
     def __init__(self, listOfExpressions: List[Expression], listOfProofs: List['Proof']) -> None:
         # Guarantees representation is correct
         # Representation types
-        assert len(listOfProofs) == self.arityProofs()
         assert len(listOfExpressions) == self.arityExpressions()
+        assert len(listOfProofs) == self.arityProofs()
+        assert len(listOfProofs) == len(self.repr_proof_types())
 
-        for expression, typeProofShouldBe in zip(listOfExpressions, self.repr_expression_types()):
-            assert isinstance(expression, typeProofShouldBe)
+        for expression, typeExpressionShouldBe in zip(listOfExpressions, self.repr_expression_types()):
+            assert isinstance(expression, typeExpressionShouldBe)
         for proof, typeProofShouldBe, typeConclusionShouldBe in zip(listOfProofs,
                                        self.repr_proof_types(),
                                        self.repr_proof_conclusion_types()):

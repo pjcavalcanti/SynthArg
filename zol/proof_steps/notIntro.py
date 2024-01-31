@@ -1,14 +1,14 @@
+from zol.expression_types.expression import Expression
 from zol.expression_types.false import FFalse
 from zol.expression_types.not_expression import Not
-from zol.expression_types.truthvalue import TruthValue
 from zol.proof_steps.proof import Proof
 
 
 class NotIntro(Proof):
     def assumptions(self):
-        return [a for a in self.proofOfAbsurd.assumptions() if a != self.propositionToProve.descendants()[0]]
+        return [a for a in self.proofOfAbsurd.assumptions() if a != self.propositionToProve]
     def conclusion(self):
-        return self.propositionToProve
+        return Not(self.propositionToProve)
     def descendants(self):
         return [self.proofOfAbsurd]
     
@@ -20,7 +20,7 @@ class NotIntro(Proof):
         return 1
     @classmethod
     def repr_expression_types(cls):
-        return [Not]
+        return [Expression]
     @classmethod
     def repr_proof_types(cls):
         return [Proof]
