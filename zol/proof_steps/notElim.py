@@ -29,7 +29,9 @@ class NotElim(Proof):
     def repr_proof_conclusion_types(cls):
         return [Expression, Not]
     @classmethod
-    def repr_proof_conclusion_invariants(cls, self):
+    def repr_proof_conclusion_invariants(cls, listOfProofs):
+        if not listOfProofs[1].conclusion() == Not(listOfProofs[0].conclusion()):
+            return False
         return True
     
     def __init__(self, listOfExpressions, listOfProofs):    
