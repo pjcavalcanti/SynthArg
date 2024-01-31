@@ -18,7 +18,7 @@ class AndElim(Proof):
         return 0
     @classmethod
     def repr_expression_types(cls):
-        return [And]
+        return []
     @classmethod
     def repr_proof_types(cls):
         return [Proof]
