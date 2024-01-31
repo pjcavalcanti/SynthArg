@@ -1,22 +1,21 @@
 from expressions import Expression, Iff, Implies, Or, TreeNode, And, TruthValue, Not
 
 class Proof(TreeNode):
-    def type(self):
-        raise NotImplementedError
     def assumptions(self):
         raise NotImplementedError
     def conclusion(self):
         raise NotImplementedError
+    def descendants(self):
+        return NotImplementedError
 
 class Axiom(Proof):
-    def type(self):
-        return "Axiom"
     def assumptions(self):
         return [self.axiomExpresion]
     def conclusion(self):
         return self.axiomExpresion
     def descendants(self):
         return []
+    
     @classmethod
     def arity(cls):
         return 0
@@ -26,8 +25,6 @@ class Axiom(Proof):
         self.axiomExpresion = expression
 
 class AndIntro(Proof):
-    def type(self):
-        return "AndIntro"
     def assumptions(self):
         return self.leftProof.assumptions() + self.rightProof.assumptions()
     def conclusion(self):
@@ -47,8 +44,6 @@ class AndIntro(Proof):
 
 class AndElim(Proof):
     # The same as AndElimRight
-    def type(self):
-        return "AndElim"
     def assumptions(self):
         return self.andProof.assumptions()
     def conclusion(self):
@@ -66,8 +61,6 @@ class AndElim(Proof):
         self.andProof = andProof
 
 class AndElimRight(Proof):
-    def type(self):
-        return "AndElimRight"
     def assumptions(self):
         return self.andProof.assumptions()
     def conclusion(self):
@@ -85,8 +78,6 @@ class AndElimRight(Proof):
         self.andProof = andProof
 
 class AndElimLeft(Proof):
-    def type(self):
-        return "AndElimLeft"
     def assumptions(self):
         return self.andProof.assumptions()
     def conclusion(self):
@@ -104,8 +95,6 @@ class AndElimLeft(Proof):
         self.andProof = andProof
 
 class ImpliesIntro(Proof):
-    def type(self):
-        return "ImpliesIntro"
     def assumptions(self):
         return [a for a in self.conclusionProof.assumptions() if a != self.conditionExpression]
     def conclusion(self):
@@ -124,8 +113,6 @@ class ImpliesIntro(Proof):
         self.conditionExpression = conditionExpression
 
 class ImpliesElim(Proof):
-    def type(self):
-        return "ImpliesElim"
     def assumptions(self):
         return self.conditionProof.assumptions() + self.conclusionProof.assumptions()
     def conclusion(self):
@@ -145,8 +132,6 @@ class ImpliesElim(Proof):
         self.conclusionProof = implicationProof
 
 class IffIntro(Proof):
-    def type(self):
-        return "IffIntro"
     def assumptions(self):
         return self.leftProof.assumptions() + self.rightProof.assumptions()
     def conclusion(self):
@@ -171,8 +156,6 @@ class IffIntro(Proof):
 
 class IffElim(Proof):
     # The same as IffElimLeft
-    def type(self):
-        return "IffElim"
     def assumptions(self):
         return self.iffProof.assumptions()
     def conclusion(self):
@@ -190,8 +173,6 @@ class IffElim(Proof):
         self.iffProof = iffProof
 
 class IffElimLeft(Proof):
-    def type(self):
-        return "IffElimLeft"
     def assumptions(self):
         return self.iffProof.assumptions()
     def conclusion(self):
@@ -209,8 +190,6 @@ class IffElimLeft(Proof):
         self.iffProof = iffProof
 
 class IffElimRight(Proof):
-    def type(self):
-        return "IffElimRight"
     def assumptions(self):
         return self.iffProof.assumptions()
     def conclusion(self):
@@ -228,8 +207,6 @@ class IffElimRight(Proof):
         self.iffProof = iffProof
 
 class NotElim(Proof):
-    def type(self):
-        return "NotElim"
     def assumptions(self):
         return self.positiveProof.assumptions() + self.negativeProof.assumptions()
     def conclusion(self):
@@ -250,8 +227,6 @@ class NotElim(Proof):
         self.negativeProof = negativeProof
 
 class NotIntro(Proof):
-    def type(self):
-        return "NotIntro"
     def assumptions(self):
         return [a for a in self.proofOfAbsurd.assumptions() if a != self.propositionToProve.descendants()[0]]
     def conclusion(self):
@@ -273,8 +248,6 @@ class NotIntro(Proof):
 
 class RAA(Proof):
     # UNTESTED
-    def type(self):
-        return "RAA"
     def assumptions(self):
         return [a for a in self.proofOfAbsurd.assumptions() if a != Not(self.propositionToProve)]
     def conclusion(self):
@@ -297,8 +270,6 @@ class RAA(Proof):
 class OrIntro(Proof):
     # UNTESTED
     # Maybe left and right versions are necessary?
-    def type(self):
-        return "OrIntro"
     def assumptions(self):
         return self.proofOfLeft.assumptions()
     def conclusion(self):
@@ -318,8 +289,6 @@ class OrIntro(Proof):
 
 class OrElim(Proof):
     # UNTESTED
-    def type(self):
-        return "OrElim"
     def assumptions(self):
         return  [a for a in self.leftProofOfP.assumptions()
                 if a != self.proofOfOr.conclusion().descendants()[0]]\

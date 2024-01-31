@@ -56,12 +56,12 @@ class TextProofRenderer(Renderer):
     def render(self, proof):
         assAndCon = self.assumptionsAndConclusions(proof)
         basedOn = "\n".join(
-            f"{i + 1}) {p.type()}\n" + self.indentHelper(self.assumptionsAndConclusions(p))
+            f"{i + 1}) {type(p)}\n" + self.indentHelper(self.assumptionsAndConclusions(p))
              for i, p in enumerate(proof.descendants())
             )
         if basedOn != "":
             basedOn = "Based on:\n" + self.indentHelper(basedOn)
-        return proof.type() + "\n" + self.indentHelper(assAndCon + "\n" + basedOn)
+        return f"{type(proof)}" + "\n" + self.indentHelper(assAndCon + "\n" + basedOn)
         
     
     def assumptionsAndConclusions(self, proof):
