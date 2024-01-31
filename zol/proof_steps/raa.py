@@ -8,7 +8,7 @@ from zol.proof_steps.proof import Proof
 class RAA(Proof):
     # UNTESTED
     def assumptions(self):
-        return [a for a in self.proofOfAbsurd.assumptions() if a !=self.propositionToProve.descendants()[0]]
+        return [a for a in self.proofOfAbsurd.assumptions() if a !=Not(self.propositionToProve)]
     def conclusion(self):
         return self.propositionToProve
     def descendants(self):
@@ -22,7 +22,7 @@ class RAA(Proof):
         return 1
     @classmethod
     def repr_expression_types(cls):
-        return [Not]
+        return [Expression]
     @classmethod
     def repr_proof_types(cls):
         return [Proof]
