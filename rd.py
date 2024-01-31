@@ -1,5 +1,5 @@
 import random
-from renderers import TextProofRenderer
+from renderers import TextExpressionRenderer, TextProofRenderer
 from zol import Expression, Variable, Implies, And, Or, Not, Iff
 from zol import AndIntro, AndElim, ImpliesElim, ImpliesIntro, RAA, OrIntro, OrElim, RAA
 from zol.expression_types.false import FFalse
@@ -25,7 +25,7 @@ def typeOfLastStep(expr):
     elif typeOfExpr == Not:
         possibleTypes.append(NotIntro)
     elif typeOfExpr == FFalse:
-        possibleTypes.append()
+        possibleTypes.append(NotElim)
     elif typeOfExpr == Iff:
         possibleTypes.append(IffIntro)
     return possibleTypes
@@ -45,26 +45,25 @@ elimDict = {
     Not: NotElim,
 }
 
-def getProofFor(expr, p = 0.1):
+def getProofFor(expr, p = 0.1, currDepth = 0):
     randExpressionGen = RandomExpressionZipf()
-    # proofTypeOptions = typeOfLastStep(expr)
-    # proofType = random.choice(proofTypeOptions)
-    if type(expr) in [Iff]:
-        # proofType = elimDict[type(expr)]
-        proofType = random.choice([ImpliesElim])
-    else:
+    proofTypeOptions = typeOfLastStep(expr)
+    
+    proofType = random.choice(proofTypeOptions)
+    if random.random() < p and not currDepth < 1:
         proofType = Axiom
-
+    
     if proofType == Axiom:
         return Axiom([expr], [])
     elif proofType == ImpliesIntro:
         # TODO: Add more options,
         # at least via "condition from a random choice from current assumptions list"
         # and via "condition as a random expression"
+        rndrExp = randExpressionGen()
         options = [
             ImpliesIntro(
                 [expr.descendants()[0]],
-                [getProofFor(expr.descendants()[1], p)],
+                [getProofFor(expr.descendants()[1], p, currDepth + 1)],
             ),
         ]
         return random.choice(options)
@@ -73,7 +72,10 @@ def getProofFor(expr, p = 0.1):
         options = [
             AndIntro(
                 [],
-                [getProofFor(expr.descendants()[0], p), getProofFor(expr.descendants()[1], p)]
+                [
+                    getProofFor(expr.descendants()[0], p, currDepth + 1),
+                    getProofFor(expr.descendants()[1], p, currDepth + 1)
+                ]
             ),
         ]
         return random.choice(options)
@@ -82,7 +84,7 @@ def getProofFor(expr, p = 0.1):
         options = [
             OrIntro(
                 [expr.descendants()[1]],
-                [getProofFor(expr.descendants()[0], p)]),
+                [getProofFor(expr.descendants()[0], p, currDepth + 1)]),
         ]
         return random.choice(options)
     elif proofType == IffIntro:
@@ -91,8 +93,8 @@ def getProofFor(expr, p = 0.1):
             IffIntro(
                 [],
                 [
-                    getProofFor(Implies(expr.descendants()[0], expr.descendants()[1]), p),
-                    getProofFor(Implies(expr.descendants()[1], expr.descendants()[0]), p)
+                    getProofFor(Implies(expr.descendants()[0], expr.descendants()[1]), p, currDepth + 1),
+                    getProofFor(Implies(expr.descendants()[1], expr.descendants()[0]), p, currDepth + 1)
                 ]),
         ]
         return random.choice(options)
@@ -101,7 +103,7 @@ def getProofFor(expr, p = 0.1):
         options = [
             NotIntro(
                 [expr.descendants()[0]],
-                [getProofFor(FFalse(), p)]
+                [getProofFor(FFalse(), p, currDepth + 1)]
             ),
         ]
         return random.choice(options)
@@ -111,7 +113,7 @@ def getProofFor(expr, p = 0.1):
         options = [
             AndElim(
                 [],
-                [getProofFor(And(expr, randExpressionGen()))],
+                [getProofFor(And(expr, randExpressionGen()), p, currDepth + 1)],
             ),
         ]
         return random.choice(options)
@@ -122,9 +124,9 @@ def getProofFor(expr, p = 0.1):
             OrElim(
                 [],
                 [
-                    getProofFor(Or(randExpressionGen(), randExpressionGen())),
-                    getProofFor(expr, p),
-                    getProofFor(expr, p),
+                    getProofFor(Or(randExpressionGen(), randExpressionGen()), p, currDepth + 1),
+                    getProofFor(expr, p, currDepth + 1),
+                    getProofFor(expr, p, currDepth + 1),
                 ],
             ),
         ]
@@ -137,31 +139,60 @@ def getProofFor(expr, p = 0.1):
             ImpliesElim(
                 [],
                 [
-                    getProofFor(rndExpr, p),
-                    getProofFor(Implies(rndExpr, expr), p),
+                    getProofFor(rndExpr, p, currDepth + 1),
+                    getProofFor(Implies(rndExpr, expr), p, currDepth + 1),
                 ],
             ),
         ]
         return random.choice(options)
     elif proofType == IffElim:
+        # TODO: Add more options, if possible
         options = [
             IffElim(
                 [],
                 [
-                    getProofFor(Iff(expr.descendants()[0], expr.descendants()[1]), p),
+                    getProofFor(Iff(expr.descendants()[0], expr.descendants()[1]), p, currDepth + 1),
                 ],
             ),
         ]
+        return random.choice(options)
+    elif proofType == NotElim:
+        # TODO: Add more options,
+        # at least via "not rndExpr from a random choice from current assumptions list"
+        rndExpr = randExpressionGen()
+        options = [
+            NotElim(
+                [],
+                [
+                    getProofFor(rndExpr, p, currDepth + 1),
+                    getProofFor(Not(rndExpr), p, currDepth + 1),
+                ]
+            )
+        ]
+        return random.choice(options)
+    elif proofType == RAA:
+        # TODO: Add more options, if possible
+        options = [
+            RAA(
+                [expr],
+                [getProofFor(FFalse(), p, currDepth + 1)],
+            )
+        ]
+        return random.choice(options)
+    raise AssertionError(f"Proof type {str(proofType)} not implemented: \n for {str(expr)}")
 
-random.seed(1)
-p = Variable("p")
-q = Variable("q")
-# toProve = p
-toProve = Iff(p, q)
-# toProve = Not(p)
-# toProve = And(p, q)
-# toProve = FFalse()
 
+random.seed(5)
+
+rdExprGen = RandomExpressionZipf(a = 6)
+
+exprRender = TextExpressionRenderer()
 render = TextProofRenderer()
-proved = render(getProofFor(toProve))
-print(proved, "\n", proved is None)
+
+
+for i in range(10):
+    toProve = rdExprGen()
+    print(f"{i + 1}-TH PROOF :: STARTING FROM {exprRender(toProve)}")
+    print(render(getProofFor(toProve, p = 0.9)))
+    if i < 9:
+        print()
