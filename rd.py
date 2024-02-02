@@ -45,7 +45,7 @@ elimDict = {
     Not: NotElim,
 }
 
-def getProofFor(expr, p = 0.1, currDepth = 0):
+def getProofFor(expr, p = 0.1, currDepth = 0, previousAssumptions = []):
     randExpressionGen = RandomExpressionZipf()
     proofTypeOptions = typeOfLastStep(expr)
     
@@ -56,10 +56,9 @@ def getProofFor(expr, p = 0.1, currDepth = 0):
     if proofType == Axiom:
         return Axiom([expr], [])
     elif proofType == ImpliesIntro:
-        # TODO: Add more options,
-        # at least via "condition from a random choice from current assumptions list"
-        # and via "condition as a random expression"
-        rndrExp = randExpressionGen()
+        # To prove expr = A->B, we need to prove B and discard A from the assumptions
+        # i.e. we need:
+        # Implies([A], [proof(B)])
         options = [
             ImpliesIntro(
                 [expr.descendants()[0]],
@@ -68,7 +67,9 @@ def getProofFor(expr, p = 0.1, currDepth = 0):
         ]
         return random.choice(options)
     elif proofType == AndIntro:
-        # TODO: Check if more options can be added
+        # To prove expr = A&B, we need to prove A and B separately,
+        # i.e. we need:
+        # AndIntro([], [proof(A), proof(B)])
         options = [
             AndIntro(
                 [],
@@ -80,7 +81,9 @@ def getProofFor(expr, p = 0.1, currDepth = 0):
         ]
         return random.choice(options)
     elif proofType == OrIntro:
-        # TODO: Check if more options can be added
+        # To prove expr = A||B, we need to prove one of them
+        # i.e. we need:
+        # OrIntro([B], [proof(A)])
         options = [
             OrIntro(
                 [expr.descendants()[1]],
@@ -88,7 +91,9 @@ def getProofFor(expr, p = 0.1, currDepth = 0):
         ]
         return random.choice(options)
     elif proofType == IffIntro:
-        # TODO: Check if more options can be added
+        # To prove expr = A<->B, we need to prove A->B and B->A
+        # i.e. we need:
+        # IffIntro([], [proof(A->B), proof(B->A)])
         options = [
             IffIntro(
                 [],
@@ -99,7 +104,9 @@ def getProofFor(expr, p = 0.1, currDepth = 0):
         ]
         return random.choice(options)
     elif proofType == NotIntro:
-        # TODO: Check if more options can be added
+        # To prove expr = ¬A, we need to prove ⊥ and discard A from the assumptions
+        # i.e. we need:
+        # NotIntro([A], [proof(FFalse)])
         options = [
             NotIntro(
                 [expr.descendants()[0]],
@@ -108,18 +115,34 @@ def getProofFor(expr, p = 0.1, currDepth = 0):
         ]
         return random.choice(options)
     elif proofType == AndElim:
-        # TODO: Add more options,
-        # at least via "and with a random choice from current assumptions list"
+        # To prove expr = A with AndElim we prove A from a proof of A and B
+        # i.e. we need:
+        # AndElim([], [proof(A&B)])
+        # 
+        # We have the option of
+            # B = random new expression
+            # B = one of the assumptions already made
         options = [
             AndElim(
                 [],
                 [getProofFor(And(expr, randExpressionGen()), p, currDepth + 1)],
             ),
         ]
+        if len(previousAssumptions) > 0:
+            options.append(
+                AndElim(
+                    [],
+                    [getProofFor(And(expr, random.choice(previousAssumptions)), p, currDepth + 1)],
+                )
+            )
         return random.choice(options)
     elif proofType == OrElim:
-        # TODO: Add more options,
-        # at least via "or with a random choice from current assumptions list"
+        # To prove C with OrElim we use a proof of A||B and two proofs of C, and eliminate A from the assumptions of the first proof(C) and B from the assumptions of the second proof(C)
+        # i.e. we need:
+        # OrElim([], [proof(A||B), proof(C), proof(C)])
+        #
+        # Note: We can use ImpliesIntro in any proof of C to get a proof of A->C and B->C,
+        # so this is equivalent to eliminating A,B from A->C & B->C using A||B, therefore proving C.
         options = [
             OrElim(
                 [],
@@ -132,8 +155,9 @@ def getProofFor(expr, p = 0.1, currDepth = 0):
         ]
         return random.choice(options)
     elif proofType == ImpliesElim:
-        # TODO: Add more options,
-        # at least via "implies with condition from a random choice from current assumptions list"
+        # To prove expr = C with ImpliesElim we use a proof of A->C and a proof of A
+        # i.e. we need:
+        # ImpliesElim([], [proof(A), proof(A->C)])
         rndExpr = randExpressionGen()
         options = [
             ImpliesElim(
@@ -146,7 +170,9 @@ def getProofFor(expr, p = 0.1, currDepth = 0):
         ]
         return random.choice(options)
     elif proofType == IffElim:
-        # TODO: Add more options, if possible
+        # To prove expr = A->B with IffElim we use a proof of A<->B
+        # i.e. we need:
+        # IffElim([], [proof(A<->B)])
         options = [
             IffElim(
                 [],
@@ -157,8 +183,10 @@ def getProofFor(expr, p = 0.1, currDepth = 0):
         ]
         return random.choice(options)
     elif proofType == NotElim:
-        # TODO: Add more options,
-        # at least via "not rndExpr from a random choice from current assumptions list"
+        # To prove expr = ⊥ with NotElim we use a proof of A and a proof of ¬A
+        # i.e. we need:
+        # NotElim([], [proof(A), proof(¬A)])
+            # Here, A can be a random expression
         rndExpr = randExpressionGen()
         options = [
             NotElim(
@@ -171,7 +199,10 @@ def getProofFor(expr, p = 0.1, currDepth = 0):
         ]
         return random.choice(options)
     elif proofType == RAA:
-        # TODO: Add more options, if possible
+        # To prove expr = A with RAA we use a proof of ⊥ and discard ¬A from the assumptions
+        # i.e. we need:
+        # RAA([A], [proof(FFalse)])
+
         options = [
             RAA(
                 [expr],
