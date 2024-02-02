@@ -1,7 +1,16 @@
 from random import Random
 from zol import Iff, Implies, Not, And, Or, Variable
 
-class RandomExpressionZipf():
+class RandomExpressionGenerator():
+    def ___init__(self, *args, **kwargs):
+        raise NotImplementedError
+    def seed(self, seed):
+        raise NotImplementedError
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError
+
+
+class RandomExpressionZipf(RandomExpressionGenerator):
     # Generates random expressions by extending a branch of the expression tree
     # with a probability that decreases with the depth of the branch.
     # The probability of extending a branch of depth Depth is:
@@ -27,9 +36,12 @@ class RandomExpressionZipf():
     def seed(self, seed):
         self.randomGenerator.seed(seed)
 
-    def __call__(self, depth = 0, arity = 1):
-        if depth < self.maxDepth:
-            shouldStop = self.randomGenerator.random() < self.probs[depth] / arity
+    def __call__(self):
+        return self._getRandomExpr(0, 1)
+    
+    def _getRandomExpr(self, currDepth = 0, currArity = 1):
+        if currDepth < self.maxDepth:
+            shouldStop = self.randomGenerator.random() < self.probs[currDepth] / currArity
         else:
             shouldStop = True
 
@@ -37,8 +49,9 @@ class RandomExpressionZipf():
             return self.randomGenerator.choice(self.leafNodes)
 
         nodeType = self.randomGenerator.choice(self.unaryNodes + self.binaryNodes)
-        arity = nodeType.arity()
+        currArity = nodeType.arity()
 
-        children = [self(depth + 1, arity) for _ in range(arity)]
+        children = [self._getRandomExpr(currDepth + 1, currArity) for _ in range(currArity)]
         expression = nodeType(*children)
         return expression
+        
