@@ -33,7 +33,7 @@ class RandomExpressionZipf(RandomExpressionGenerator):
     #       1 - sum_{d <= Depth} 1 / (d + b) ** a / arity_of_currNode.
     #
     # We stop extending if we reach a maximum depth.
-    def __init__(self, variables = ["p", "q", "r"], maxDepth = 0, a = 3, b = 2.7):
+    def __init__(self, variables = ["p", "q", "r"], maxDepth = 5, a = 3, b = 2.7):
         self.randomGenerator = random.Random()
 
         self.varNames = variables

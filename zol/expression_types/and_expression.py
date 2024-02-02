@@ -1,4 +1,4 @@
-from .expression import Expression
+from zol.expression_types.expression import Expression
 
 class And(Expression):
     def descendants(self):
