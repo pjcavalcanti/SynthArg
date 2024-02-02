@@ -69,3 +69,14 @@ def isIsomorphic(expr1, expr2):
     
     return variablesAreIsomorphic(variables1, variables2)
 
+A = Variable("A")
+B = Variable("B")
+C = And(A, B)
+D = And(B, A)
+E = And(A, A)
+
+print(isIsomorphic(A, B))
+print(isIsomorphic(A, A))
+print(isIsomorphic(A, C))
+print(isIsomorphic(C, D))
+print(isIsomorphic(D, E))
