@@ -193,6 +193,6 @@ render = TextProofRenderer()
 for i in range(10000):
     toProve = rdExprGen()
     print(f"{i + 1}-TH PROOF :: STARTING FROM {exprRender(toProve)}")
-    print(render(getProofFor(toProve, p = 0.9)))
+    print(render(getProofFor(toProve, p = 0.4)))
     if i < 9:
         print()
