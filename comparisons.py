@@ -1,4 +1,6 @@
+from tqdm import tqdm
 from generators import RandomExpressionZipf
+from renderers import TextExpressionRenderer
 from zol import Expression, Variable, And
 
 def isFormEquivalentExpression(expr1, expr2):
@@ -69,14 +71,34 @@ def isIsomorphic(expr1, expr2):
     
     return variablesAreIsomorphic(variables1, variables2)
 
-A = Variable("A")
-B = Variable("B")
-C = And(A, B)
-D = And(B, A)
-E = And(A, A)
+import matplotlib.pyplot as plt
 
-print(isIsomorphic(A, B))
-print(isIsomorphic(A, A))
-print(isIsomorphic(A, C))
-print(isIsomorphic(C, D))
-print(isIsomorphic(D, E))
+exprRender = TextExpressionRenderer()
+rdExprGen = RandomExpressionZipf(variables=["a, b, c, d, e, f"], maxDepth=10, a=2.1)
+rdExprGen.seed(0)
+
+expSet = set()
+sizes = []
+for i in tqdm(range(10000)):
+    sizes.append(len(expSet))
+    newExpr = rdExprGen()
+    if len(expSet) > 0 and any(isIsomorphic(newExpr, e) for e in expSet):
+        continue
+    expSet.add(newExpr)
+print(len(expSet))
+plt.plot(sizes)
+plt.show()
+
+import sys
+
+depths = []
+avgExprSize = 0
+for e in expSet:
+    avgExprSize += sys.getsizeof(exprRender(e))
+    depths.append(e.depth())
+    print(sys.getsizeof(exprRender(e)))
+
+print(avgExprSize / len(expSet))
+
+plt.hist(depths, bins=range(1, 11), align="left", rwidth=0.8)
+plt.show()

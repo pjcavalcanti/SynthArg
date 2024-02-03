@@ -1,3 +1,4 @@
+from comparisons import isIsomorphic
 from zol import Variable, Not, And, Or, Implies, Iff, TruthValue
 from zol import RAA, AndIntro, Axiom, IffIntro, ImpliesElim, ImpliesIntro, NotElim, NotIntro, AndElim, IffElim, Proof
 
@@ -53,4 +54,15 @@ def test_proofs_steps():
     print(render(pr10))
     print(render(pr11))
 
+def test_comparisons():
+    A = Variable("A")
+    B = Variable("B")
+    C = And(A, B)
+    D = And(B, A)
+    E = And(A, A)
 
+    print(isIsomorphic(A, B))
+    print(isIsomorphic(A, A))
+    print(isIsomorphic(A, C))
+    print(isIsomorphic(C, D))
+    print(isIsomorphic(D, E))
