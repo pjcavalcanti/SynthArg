@@ -1,5 +1,6 @@
 import json
 from zol import Variable, And, Or, Not, Implies, Iff, Expression
+from zol import Proof, AndIntro, AndElim, OrIntro, OrElim, NotIntro, NotElim, ImpliesIntro, ImpliesElim, IffIntro, IffElim, RAA
 
 def serialize_expression(expr):
     assert isinstance(expr, Expression)
@@ -36,6 +37,11 @@ def serialize_expression(expr):
         }
     raise ValueError(f"Unknown expression type: {expr}")
 
+def serialize_proof(proof):
+    assert isinstance(proof, Proof)
+
+    if isinstance(proof, AndIntro)
+
 def deserialize_expression(expr):
     assert isinstance(expr, dict)
 
@@ -68,32 +74,36 @@ if __name__ == "__main__":
     import os
     from tqdm import tqdm
 
-    # Test with simple expressions
+    def test_serialize_save_load_expression():
+        # Test with simple expressions
+        a = Variable("a")
+        b = Variable("b")
+        c = Variable("c")
+        expr1 = And(Or(a, b), Not(c))
+        expr2 = Implies(a, b)
+        
+        assert deserialize_expression(serialize_expression(expr1)) == expr1
+        assert deserialize_expression(serialize_expression(expr2)) == expr2
+        save_expressions([expr1, expr2], "test1.json")
+        dexprs = load_expressions("test1.json")
+        assert dexprs[0] == expr1
+        assert dexprs[1] == expr2
+        os.remove("test1.json")
+
+        # Test with random expressions
+        getRandExpr = RandomExpressionZipf(["a", "b", "c", "d", "e", "f"],10, 2, 3)
+        exprs = []
+        for _ in tqdm(range(1000)):
+            expr = getRandExpr()
+            assert deserialize_expression(serialize_expression(expr)) == expr
+            exprs.append(expr)
+        save_expressions(exprs, "test2.json")
+        dexprs = load_expressions("test2.json")
+        for expr, dexpr in zip(exprs, dexprs):
+            assert expr == dexpr
+        os.remove("test2.json")
+
+        print("All expression tests passed")
+
+
     a = Variable("a")
-    b = Variable("b")
-    c = Variable("c")
-    expr1 = And(Or(a, b), Not(c))
-    expr2 = Implies(a, b)
-    
-    assert deserialize_expression(serialize_expression(expr1)) == expr1
-    assert deserialize_expression(serialize_expression(expr2)) == expr2
-    save_expressions([expr1, expr2], "test1.json")
-    dexprs = load_expressions("test1.json")
-    assert dexprs[0] == expr1
-    assert dexprs[1] == expr2
-    os.remove("test1.json")
-
-    # Test with random expressions
-    getRandExpr = RandomExpressionZipf(["a", "b", "c", "d", "e", "f"],10, 2, 3)
-    exprs = []
-    for _ in tqdm(range(1000)):
-        expr = getRandExpr()
-        assert deserialize_expression(serialize_expression(expr)) == expr
-        exprs.append(expr)
-    save_expressions(exprs, "test2.json")
-    dexprs = load_expressions("test2.json")
-    for expr, dexpr in zip(exprs, dexprs):
-        assert expr == dexpr
-    os.remove("test2.json")
-
-    print("All tests passed")
