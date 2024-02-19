@@ -1,6 +1,20 @@
 import json
 from zol import Variable, And, Or, Not, Implies, Iff, Expression
-from zol import Proof, AndIntro, AndElim, OrIntro, OrElim, NotIntro, NotElim, ImpliesIntro, ImpliesElim, IffIntro, IffElim, RAA
+from zol import (
+    Proof,
+    AndIntro,
+    AndElim,
+    OrIntro,
+    OrElim,
+    NotIntro,
+    NotElim,
+    ImpliesIntro,
+    ImpliesElim,
+    IffIntro,
+    IffElim,
+    RAA,
+)
+
 
 def serialize_expression(expr):
     assert isinstance(expr, Expression)
@@ -8,39 +22,43 @@ def serialize_expression(expr):
     if isinstance(expr, And):
         return {
             "type": "And",
-            "args": [serialize_expression(arg) for arg in expr.descendants()]
+            "args": [serialize_expression(arg) for arg in expr.descendants()],
         }
     elif isinstance(expr, Or):
         return {
             "type": "Or",
-            "args": [serialize_expression(arg) for arg in expr.descendants()]
+            "args": [serialize_expression(arg) for arg in expr.descendants()],
         }
     elif isinstance(expr, Not):
         return {
             "type": "Not",
-            "args": [serialize_expression(arg) for arg in expr.descendants()]
+            "args": [serialize_expression(arg) for arg in expr.descendants()],
         }
     elif isinstance(expr, Implies):
         return {
             "type": "Implies",
-            "args": [serialize_expression(arg) for arg in expr.descendants()]
+            "args": [serialize_expression(arg) for arg in expr.descendants()],
         }
     elif isinstance(expr, Iff):
         return {
             "type": "Iff",
-            "args": [serialize_expression(arg) for arg in expr.descendants()]
+            "args": [serialize_expression(arg) for arg in expr.descendants()],
         }
     elif isinstance(expr, Variable):
-        return {
-            "type": "Variable",
-            "name": expr.name
-        }
+        return {"type": "Variable", "name": expr.name}
     raise ValueError(f"Unknown expression type: {expr}")
+
 
 def serialize_proof(proof):
     assert isinstance(proof, Proof)
 
-    if isinstance(proof, AndIntro)
+    if isinstance(proof, AndIntro):
+        return {
+            "type": "AndIntro",
+            "exprList": [serialize_expression(arg) for arg in proof.descendants()],
+            "proofList": [serialize_proof(arg) for arg in proof.descendants()],
+        }
+
 
 def deserialize_expression(expr):
     assert isinstance(expr, dict)
@@ -52,12 +70,19 @@ def deserialize_expression(expr):
     elif expr["type"] == "Not":
         return Not(deserialize_expression(expr["args"][0]))
     elif expr["type"] == "Implies":
-        return Implies(deserialize_expression(expr["args"][0]), deserialize_expression(expr["args"][1]))
+        return Implies(
+            deserialize_expression(expr["args"][0]),
+            deserialize_expression(expr["args"][1]),
+        )
     elif expr["type"] == "Iff":
-        return Iff(deserialize_expression(expr["args"][0]), deserialize_expression(expr["args"][1]))
+        return Iff(
+            deserialize_expression(expr["args"][0]),
+            deserialize_expression(expr["args"][1]),
+        )
     elif expr["type"] == "Variable":
         return Variable(expr["name"])
     raise ValueError(f"Unknown expression type: {expr}")
+
 
 def save_expressions(exprs, filename):
     with open(filename, "w") as f:
@@ -65,10 +90,12 @@ def save_expressions(exprs, filename):
             json.dump(serialize_expression(expr), f)
             f.write("\n")
 
+
 def load_expressions(filename):
     with open(filename) as f:
         return [deserialize_expression(json.loads(line)) for line in f]
-    
+
+
 if __name__ == "__main__":
     from generators import RandomExpressionZipf
     import os
@@ -81,7 +108,7 @@ if __name__ == "__main__":
         c = Variable("c")
         expr1 = And(Or(a, b), Not(c))
         expr2 = Implies(a, b)
-        
+
         assert deserialize_expression(serialize_expression(expr1)) == expr1
         assert deserialize_expression(serialize_expression(expr2)) == expr2
         save_expressions([expr1, expr2], "test1.json")
@@ -91,7 +118,7 @@ if __name__ == "__main__":
         os.remove("test1.json")
 
         # Test with random expressions
-        getRandExpr = RandomExpressionZipf(["a", "b", "c", "d", "e", "f"],10, 2, 3)
+        getRandExpr = RandomExpressionZipf(["a", "b", "c", "d", "e", "f"], 10, 2, 3)
         exprs = []
         for _ in tqdm(range(1000)):
             expr = getRandExpr()
@@ -104,6 +131,5 @@ if __name__ == "__main__":
         os.remove("test2.json")
 
         print("All expression tests passed")
-
 
     a = Variable("a")
