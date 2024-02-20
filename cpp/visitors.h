@@ -3,7 +3,7 @@
 
 #include "formulas.h"
 
-class ToStringVisitor : public Visitor<std::string> {
+class ToStringVisitor : public FormulaVisitor<std::string> {
     private:
         std::string visit(const Var* formula) override {
             return formula->name;

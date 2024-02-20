@@ -2,6 +2,7 @@
 #define FORMULAS_H
 
 #include <string>
+#include "shared_macros.h"
 
 class Formula;
 class Var;
@@ -11,28 +12,8 @@ class Or;
 class Implies;
 class Iff;
 
-#define MACRO_OVER_TYPES(MACRO) \
-    MACRO(std::string) \
-    MACRO(bool) \
-    MACRO(Formula*) \
-    MACRO(int) \
-    MACRO(void) \
-    MACRO(double) \
-    MACRO(char)
-
-#define ACCEPT_T(T) \
-    T accept(Visitor<T>* visitor) override { \
-        return visitor->visit(this); \
-    }
-
-#define VIRTUAL_ACCEPT_T(T) \
-    virtual T accept(Visitor<T>* visitor) = 0;
-
-#define ACCEPT_VISITOR_MACRO() \
-    MACRO_OVER_TYPES(ACCEPT_T)
-    
 template <typename T>
-class Visitor {
+class FormulaVisitor {
     public:
         virtual T visit(const Var* formula) = 0;
         virtual T visit(const Not* formula) = 0;
@@ -40,19 +21,28 @@ class Visitor {
         virtual T visit(const Or* formula) = 0;
         virtual T visit(const Implies* formula) = 0;
         virtual T visit(const Iff* formula) = 0;
-        virtual ~Visitor() {}
+        virtual ~FormulaVisitor() {}
 };
+
+#define ACCEPT_FORMULA_VISITOR_T(T) \
+    T accept(FormulaVisitor<T>* visitor) override { \
+        return visitor->visit(this); \
+    }
+
+#define VIRTUAL_ACCEPT_FORMULA_VISITOR_T(T) \
+    virtual T accept(FormulaVisitor<T>* visitor) = 0;
+
 
 class Formula {
     public:
-        MACRO_OVER_TYPES(VIRTUAL_ACCEPT_T)
+        MACRO_OVER_TYPES(VIRTUAL_ACCEPT_FORMULA_VISITOR_T)
         
         virtual ~Formula() {}
 };
 
 class Var : public Formula {
     public:
-        MACRO_OVER_TYPES(ACCEPT_T)
+        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
 
         std::string name;
         Var(std::string name) : name(name) {}
@@ -60,7 +50,7 @@ class Var : public Formula {
 
 class Not : public Formula {
     public:
-        MACRO_OVER_TYPES(ACCEPT_T)
+        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
         
         Formula* f1;
         Not(Formula &f1) : f1(&f1) {}
@@ -68,7 +58,7 @@ class Not : public Formula {
 
 class And : public Formula {
     public:
-        MACRO_OVER_TYPES(ACCEPT_T)
+        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
         
         Formula* f1;
         Formula* f2;
@@ -77,7 +67,7 @@ class And : public Formula {
 
 class Or : public Formula {
     public:
-        MACRO_OVER_TYPES(ACCEPT_T)
+        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
         
         Formula* f1;
         Formula* f2;
@@ -86,7 +76,7 @@ class Or : public Formula {
 
 class Implies : public Formula {
     public:
-        MACRO_OVER_TYPES(ACCEPT_T)
+        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
         
         Formula* f1;
         Formula* f2;
@@ -95,7 +85,7 @@ class Implies : public Formula {
 
 class Iff : public Formula {
     public:
-        MACRO_OVER_TYPES(ACCEPT_T)
+        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
         
         Formula* f1;
         Formula* f2;
