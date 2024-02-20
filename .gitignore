@@ -1,0 +1,4 @@
+.vscode/*
+__pycache__/*
+*cpython*
+__pycache__/generators.cpython-311.pyc

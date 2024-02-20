@@ -16,11 +16,13 @@ from zol.proof_steps.raa import RAA
 from zol.proof_steps.proof import Proof
 
 
-class RandomExpressionGenerator():
+class RandomExpressionGenerator:
     def ___init__(self, *args, **kwargs):
         raise NotImplementedError
+
     def seed(self, seed):
         raise NotImplementedError
+
     def __call__(self, *args, **kwargs):
         raise NotImplementedError
 
@@ -33,7 +35,7 @@ class RandomExpressionZipf(RandomExpressionGenerator):
     #       1 - sum_{d <= Depth} 1 / (d + b) ** a / arity_of_currNode.
     #
     # We stop extending if we reach a maximum depth.
-    def __init__(self, variables = ["p", "q", "r"], maxDepth = 5, a = 3, b = 2.7):
+    def __init__(self, variables=["p", "q", "r"], maxDepth=5, a=3, b=2.7):
         self.randomGenerator = random.Random()
 
         self.varNames = variables
@@ -53,10 +55,12 @@ class RandomExpressionZipf(RandomExpressionGenerator):
 
     def __call__(self):
         return self._getRandomExpr(0, 1)
-    
-    def _getRandomExpr(self, currDepth = 0, currArity = 1):
+
+    def _getRandomExpr(self, currDepth=0, currArity=1):
         if currDepth < self.maxDepth:
-            shouldStop = self.randomGenerator.random() < self.probs[currDepth] / currArity
+            shouldStop = (
+                self.randomGenerator.random() < self.probs[currDepth] / currArity
+            )
         else:
             shouldStop = True
 
@@ -66,13 +70,15 @@ class RandomExpressionZipf(RandomExpressionGenerator):
         nodeType = self.randomGenerator.choice(self.unaryNodes + self.binaryNodes)
         currArity = nodeType.arity()
 
-        children = [self._getRandomExpr(currDepth + 1, currArity) for _ in range(currArity)]
+        children = [
+            self._getRandomExpr(currDepth + 1, currArity) for _ in range(currArity)
+        ]
         expression = nodeType(*children)
         return expression
 
 
-class RandomProofZipf():
-    
+class RandomProofZipf:
+
     @staticmethod
     def _typeOfLastStep(expr):
         typeOfExpr = type(expr)
@@ -91,13 +97,10 @@ class RandomProofZipf():
         elif typeOfExpr == Iff:
             possibleTypes.append(IffIntro)
         return possibleTypes
-    
-    def __init__(self,
-                 maxDepth = 10,
-                 a = 3,
-                 b = 2.7,
-                 randomExpressionGenerator = RandomExpressionZipf()
-        ):
+
+    def __init__(
+        self, maxDepth=10, a=3, b=2.7, randomExpressionGenerator=RandomExpressionZipf()
+    ):
         assert isinstance(randomExpressionGenerator, RandomExpressionGenerator)
 
         self.randExpressionGen = randomExpressionGenerator
@@ -116,24 +119,26 @@ class RandomProofZipf():
     def __call__(self):
         return self._getProofFor(self.randExpressionGen())
 
-    def _getProofFor(self, expr, currDepth = 0, currArity = 1):
+    def _getProofFor(self, expr, currDepth=0, currArity=1):
         if currDepth < self.maxDepth:
-            shouldStop = self.randomGenerator.random() < self.probs[currDepth] / currArity
+            shouldStop = (
+                self.randomGenerator.random() < self.probs[currDepth] / currArity
+            )
         else:
             shouldStop = True
-        
-        if shouldStop: 
-            return Axiom([expr], []) 
+
+        if shouldStop:
+            return Axiom([expr], [])
 
         proofTypeOptions = self._typeOfLastStep(expr)
-        
+
         ## FIX STOPING MECANISM
 
         proofType = random.choice(proofTypeOptions)
-        
+
         if proofType == Axiom:
             return Axiom([expr], [])
-        
+
         elif proofType == ImpliesIntro:
             # To prove expr = A->B, we need to prove B and discard A from the assumptions
             # i.e. we need:
@@ -142,9 +147,9 @@ class RandomProofZipf():
             A = expr.descendants()[0]
             B = expr.descendants()[1]
             proofB = self._getProofFor(B, currDepth + 1, currArity)
-            
+
             return ImpliesIntro([A], [proofB])
-        
+
         elif proofType == AndIntro:
             # To prove expr = A&B, we need to prove A and B separately,
             # i.e. we need:
@@ -156,7 +161,7 @@ class RandomProofZipf():
             proofB = self._getProofFor(B, currDepth + 1, currArity)
 
             return AndIntro([], [proofA, proofB])
-        
+
         elif proofType == OrIntro:
             # To prove expr = A||B, we need to prove one of them
             # i.e. we need:
@@ -167,7 +172,7 @@ class RandomProofZipf():
             proofA = self._getProofFor(A, currDepth + 1, currArity)
 
             return OrIntro([B], [proofA])
-        
+
         elif proofType == IffIntro:
             # To prove expr = A<->B, we need to prove A->B and B->A
             # i.e. we need:
@@ -177,33 +182,33 @@ class RandomProofZipf():
             B = expr.descendants()[1]
             proofAiB = self._getProofFor(Implies(A, B), currDepth + 1, currArity)
             proofBiA = self._getProofFor(Implies(B, A), currDepth + 1, currArity)
-            
+
             return IffIntro([], [proofAiB, proofBiA])
-        
+
         elif proofType == NotIntro:
             # To prove expr = ¬A, we need to prove ⊥ and discard A from the assumptions
             # i.e. we need:
             # NotIntro([A], [proof(FFalse)])
-        
+
             A = expr.descendants()[0]
             proofFalse = self._getProofFor(FFalse(), currDepth + 1, currArity)
 
             return NotIntro([A], [proofFalse])
-        
+
         elif proofType == AndElim:
             # To prove expr = A with AndElim we prove A from a proof of A and B
             # i.e. we need:
             # AndElim([], [proof(A&B)])
-            # 
+            #
             # We have the option of
-                # B = random new expression
+            # B = random new expression
 
             A = expr
             B = self.randExpressionGen()
             proofAandB = self._getProofFor(And(A, B), currDepth + 1, currArity)
 
             return AndElim([], [proofAandB])
-        
+
         elif proofType == OrElim:
             # To prove C with OrElim we use a proof of A||B and two proofs of C, and eliminate A from the assumptions of the first proof(C) and B from the assumptions of the second proof(C)
             # i.e. we need:
@@ -220,35 +225,35 @@ class RandomProofZipf():
             proofC2 = self._getProofFor(C, currDepth + 1, currArity)
 
             return OrElim([], [proofAorB, proofC1, proofC2])
-            
+
         elif proofType == ImpliesElim:
             # To prove expr = C with ImpliesElim we use a proof of A->C and a proof of A
             # i.e. we need:
             # ImpliesElim([], [proof(A), proof(A->C)])
-            
+
             C = expr
             A = self.randExpressionGen()
             proofA = self._getProofFor(A, currDepth + 1, currArity)
             proofAiC = self._getProofFor(Implies(A, C), currDepth + 1, currArity)
 
             return ImpliesElim([], [proofA, proofAiC])
-            
+
         elif proofType == IffElim:
             # To prove expr = A->B with IffElim we use a proof of A<->B
             # i.e. we need:
             # IffElim([], [proof(A<->B)])
-            
+
             A = expr.descendants()[0]
             B = expr.descendants()[1]
             proofAiffB = self._getProofFor(Iff(A, B), currDepth + 1, currArity)
-        
+
             return IffElim([], [proofAiffB])
-        
+
         elif proofType == NotElim:
             # To prove expr = ⊥ with NotElim we use a proof of A and a proof of ¬A
             # i.e. we need:
             # NotElim([], [proof(A), proof(¬A)])
-                # Here, A can be a random expression
+            # Here, A can be a random expression
 
             A = self.randExpressionGen()
             proofA = self._getProofFor(A, currDepth + 1, currArity)
@@ -271,5 +276,7 @@ class RandomProofZipf():
             proofFalse = self._getProofFor(FFalse(), currDepth + 1, currArity)
 
             return RAA([A], [proofFalse])
-        
-        raise AssertionError(f"Proof type {str(proofType)} not implemented: \n for {str(expr)}")
+
+        raise AssertionError(
+            f"Proof type {str(proofType)} not implemented: \n for {str(expr)}"
+        )

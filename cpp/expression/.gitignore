@@ -1,0 +1,5 @@
+build/*
+logic/*
+.vscode/*
+__pycache__/*
+*.cpython*
