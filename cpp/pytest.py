@@ -1,8 +1,8 @@
 from SynthExpr import Var, And, Or, Not, Implies, Iff
-from SynthExpr import ToString
 from SynthExpr import RandomGeneratorZipf
+from SynthExpr import ToString
 
-from ...generators import RandomExpressionZipf as RandomGeneratorZipfZol
+# from ..generators import RandomExpressionZipf as RandomGeneratorZipfZol
 
 
 def testFormulas():
@@ -32,9 +32,12 @@ def testFormulas():
     print(toString(p_iff_q))
 
 
+# testFormulas()
+
+toString = ToString()
 rdGen = RandomGeneratorZipf()
-rdGenZol = RandomGeneratorZipfZol()
+# rdGenZol = RandomGeneratorZipfZol()
 rdGen.seed(1)
 for _ in range(10):
-    print(rdGenZol())
-    # print(toString(rdGen()))
+    # print(rdGenZol())
+    print(toString(rdGen()))

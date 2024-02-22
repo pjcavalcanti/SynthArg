@@ -2,94 +2,103 @@
 #define FORMULAS_H
 
 #include <string>
-#include "shared_macros.h"
+#include <memory>
 
-class Formula;
-class Var;
-class Not;
-class And;
-class Or;
-class Implies;
-class Iff;
+struct Formula;
+struct Var;
+struct Not;
+struct And;
+struct Or;
+struct Implies;
+struct Iff;
 
-template <typename T>
-class FormulaVisitor {
-    public:
-        virtual T visit(const Var* formula) = 0;
-        virtual T visit(const Not* formula) = 0;
-        virtual T visit(const And* formula) = 0;
-        virtual T visit(const Or* formula) = 0;
-        virtual T visit(const Implies* formula) = 0;
-        virtual T visit(const Iff* formula) = 0;
-        virtual ~FormulaVisitor() {}
+using FormulaPtr = std::shared_ptr<Formula>;
+using VarPtr = std::shared_ptr<Var>;
+using NotPtr = std::shared_ptr<Not>;
+using AndPtr = std::shared_ptr<And>;
+using OrPtr = std::shared_ptr<Or>;
+using ImpliesPtr = std::shared_ptr<Implies>;
+using IffPtr = std::shared_ptr<Iff>;
+
+struct Formula {
+    enum Type {
+        VAR,
+        NOT,
+        AND,
+        OR,
+        IMPLIES,
+        IFF,
+    };
+    Type type;
+    std::shared_ptr<Formula> f1;
+    std::shared_ptr<Formula> f2;
+    virtual ~Formula() = default;
 };
 
-#define ACCEPT_FORMULA_VISITOR_T(T) \
-    T accept(FormulaVisitor<T>* visitor) override { \
-        return visitor->visit(this); \
+struct Var : Formula {
+    std::string name;
+    Var(std::string name) : name(name) {
+        type = VAR;
     }
-
-#define VIRTUAL_ACCEPT_FORMULA_VISITOR_T(T) \
-    virtual T accept(FormulaVisitor<T>* visitor) = 0;
-
-
-class Formula {
-    public:
-        MACRO_OVER_TYPES(VIRTUAL_ACCEPT_FORMULA_VISITOR_T)
-        
-        virtual ~Formula() {}
+    static std::shared_ptr<Var> create (std::string name) {
+        return std::make_shared<Var>(name);
+    }
 };
 
-class Var : public Formula {
-    public:
-        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
-
-        std::string name;
-        Var(std::string name) : name(name) {}
+struct Not : Formula {
+    Not(std::shared_ptr<Formula> _f1) {
+        type = NOT;
+        f1 = _f1;
+    }
+    static std::shared_ptr<Not> create (std::shared_ptr<Formula> f1) {
+        return std::make_shared<Not>(f1);
+    }
 };
 
-class Not : public Formula {
-    public:
-        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
-        
-        Formula* f1;
-        Not(Formula &f1) : f1(&f1) {}
+struct And : Formula {
+    And(std::shared_ptr<Formula> _f1, std::shared_ptr<Formula> _f2) {
+        type = AND;
+        f1 = _f1;
+        f2 = _f2;
+    }
+    static std::shared_ptr<And> create (std::shared_ptr<Formula> f1, std::shared_ptr<Formula> f2) {
+        return std::make_shared<And>(f1, f2);
+    }
 };
 
-class And : public Formula {
-    public:
-        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
-        
-        Formula* f1;
-        Formula* f2;
-        And(Formula &f1, Formula &f2) : f1(&f1), f2(&f2) {}
+struct Or : Formula {
+    Or(std::shared_ptr<Formula> _f1, std::shared_ptr<Formula> _f2) {
+        type = OR;
+        f1 = _f1;
+        f2 = _f2;
+    }
+    static std::shared_ptr<Or> create (std::shared_ptr<Formula> f1, std::shared_ptr<Formula> f2) {
+        return std::make_shared<Or>(f1, f2);
+    }
 };
 
-class Or : public Formula {
-    public:
-        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
-        
-        Formula* f1;
-        Formula* f2;
-        Or(Formula &f1, Formula &f2) : f1(&f1), f2(&f2) {}
+struct Implies : Formula {
+    Implies(std::shared_ptr<Formula> _f1, std::shared_ptr<Formula> _f2) {
+        type = IMPLIES;
+        f1 = _f1;
+        f2 = _f2;
+    }
+    static std::shared_ptr<Implies> create (std::shared_ptr<Formula> f1, std::shared_ptr<Formula> f2) {
+        return std::make_shared<Implies>(f1, f2);
+    }
 };
 
-class Implies : public Formula {
-    public:
-        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
-        
-        Formula* f1;
-        Formula* f2;
-        Implies(Formula &f1, Formula &f2) : f1(&f1), f2(&f2) {}
+struct Iff : Formula {
+    Iff(std::shared_ptr<Formula> _f1, std::shared_ptr<Formula> _f2) {
+        type = IFF;
+        f1 = _f1;
+        f2 = _f2;
+    }
+    static std::shared_ptr<Iff> create (std::shared_ptr<Formula> f1, std::shared_ptr<Formula> f2) {
+        return std::make_shared<Iff>(f1, f2);
+    }
 };
 
-class Iff : public Formula {
-    public:
-        MACRO_OVER_TYPES(ACCEPT_FORMULA_VISITOR_T)
-        
-        Formula* f1;
-        Formula* f2;
-        Iff(Formula &f1, Formula &f2) : f1(&f1), f2(&f2) {}
-};
+
 
 #endif

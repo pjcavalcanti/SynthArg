@@ -1,46 +1,105 @@
 #include <iostream>
+#include <vector>
 
 #include "formulas.h"
-#include "visitors.h"
+#include "functions.h"
 #include "generators.h"
 
 void testToString() {
-    Var x("x");
-    Var p("y");
-    Not Notx(x);
-    And xAndp (x, p);
-    Or xOrp (x, p);
-    Implies xImpliesp (x, p);
-    Iff xIffp (x, p);
+    #define cout std::cout
+    #define endl std::endl
 
-    ToStringVisitor toString = ToStringVisitor();
+    auto p = Var::create("p");
+    auto q = Var::create("q");
+    auto Notp = Not::create(p);
+    auto pAndq = And::create(p, q);
+    auto pOrq = Or::create(p, q);
+    auto pImpliesq = Implies::create(p, q);
+    auto pIffq = Iff::create(p, q);
 
-    std::cout << toString(x) << std::endl;
-    std::cout << toString(Notx) << std::endl;
-    std::cout << toString(xAndp) << std::endl;
-    std::cout << toString(xOrp) << std::endl;
-    std::cout << toString(xImpliesp) << std::endl;
-    std::cout << toString(xIffp) << std::endl;
+    auto toString = ToStringFunction();
+
+    cout << toString(p) << endl;
+    cout << toString(Notp) << endl;
+    cout << toString(pAndq) << endl;
+    cout << toString(pOrq) << endl;
+    cout << toString(pImpliesq) << endl;
+    cout << toString(pIffq) << endl;
+
+    auto NotNotpAndq = Not::create(And::create(Not::create(p), q));
+
+    cout << toString(NotNotpAndq) << endl;
 }
 
 void testRandExpr() {
+    #define cout std::cout
+    #define endl std::endl
+
     double a = 1.1;
     double b = 2.7;
     int maxDepth = 5;
-    std::vector<Var> vars = {Var("x"), Var("y"), Var("z")};
+    std::vector<VarPtr> vars = {Var::create("x"), Var::create("y"), Var::create("z")};
 
     RandomGeneratorZipf randGen = RandomGeneratorZipf(vars, maxDepth, a, b);
     randGen.seed(1);
 
-    ToStringVisitor toString = ToStringVisitor();
-    Formula* expr = randGen();
+    auto toString = ToStringFunction();
+
+    FormulaPtr expr = randGen();
+    cout << toString(expr) << endl;
     for (int i = 0; i < 10; i++) {
-        std::cout << toString(*expr) << std::endl;
+        cout << toString(expr) << endl;
         expr = randGen();
     }
 }
+
+void testCountNodes() {
+    struct NodeCounter {
+        int operator()(const FormulaPtr f) const {
+            switch (f->type) {
+                case Formula::VAR:
+                    return 1;
+                case Formula::NOT:
+                    return 1 + operator()(f->f1);
+                case Formula::AND:
+                case Formula::OR:
+                case Formula::IMPLIES:
+                case Formula::IFF:
+                    return 1 + operator()(f->f1) + operator()(f->f2);
+            }
+        }
+    };
+    auto counter = NodeCounter();
+
+    std::vector<VarPtr> vars = {Var::create("x"),
+                                Var::create("y"),
+                                Var::create("z")};
+    double a = 1.1;
+    double b = 2.7;
+    int maxDepth = 5;
+
+    auto toString = ToStringFunction();
+    auto randGen = RandomGeneratorZipf(vars, maxDepth, a, b);
+    randGen.seed(1);
+
+    int totalNodes = 0;
+
+    FormulaPtr expr = randGen();
+    totalNodes += counter(expr);
+    cout << toString(expr) << " " << " has " <<  counter(expr) << " nodes." << endl;
+    for (int i = 0; i < 10; i++) {
+        expr = randGen();
+        totalNodes += counter(expr);
+        cout << toString(expr) << " " << " has " <<  counter(expr) << " nodes." << endl;
+    }
+    cout << "Total nodes: " << totalNodes << endl;
+}
+
+
 int main() {
-    testRandExpr();
+    // testToString();
+    // testRandExpr();
+    testCountNodes();
     return 0;
 }
 
